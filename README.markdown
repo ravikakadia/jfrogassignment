@@ -108,6 +108,8 @@ The Locust test performs the following tasks:
 - **push_docker_image**: Pushes `alpine:3.9` to the repository.
 - **create_policy**: Creates a security policy in JFrog Xray.
 - **create_watch**: Configures a watch to monitor the repository for security issues.
+- **apply watch**: Applying watch with given policy.
+- **get violations**: get violations of uploaded container image. 
 
 ## Troubleshooting
 - **CSV Not Generated**:
