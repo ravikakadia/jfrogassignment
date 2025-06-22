@@ -40,7 +40,6 @@ This project uses [Locust](https://locust.io/) to perform load testing on JFrog 
    PASSWORD = "your_password"
    REPO_NAME = "docker-local"
    IMAGE_NAME = "alpine:3.9"
-   CUSTOM_TAG = "test"
    ```
 
 3. **Install Dependencies**:
