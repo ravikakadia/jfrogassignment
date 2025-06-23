@@ -83,7 +83,7 @@ This project uses [Locust](https://locust.io/) to perform load testing on JFrog 
 ## Analyzing the Report
 1. **Run Analysis Script**:
    ```bash
-   python analyze_report.py performance_report_20250619_170000.csv
+   python analysis.py performance_report_20250619_170000.csv
    ```
    - Generates:
      - `response_time.png`: Response time trends per operation.
