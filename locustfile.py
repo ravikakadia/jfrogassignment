@@ -43,11 +43,49 @@ metrics_data = []
 def on_locust_init(environment, **kwargs):
     if isinstance(environment.runner, MasterRunner):
         logging.info("Master node initialized")
+        if not hasattr(sys, "master_reports"):
+            sys.master_reports = {}
+        environment.runner.register_message("metrics_report", handle_metrics_report)
     elif isinstance(environment.runner, WorkerRunner):
         logging.info("Worker node initialized")
     else:
         logging.info("Local runner initialized")
-    sys.locust_environment = environment  # Store environment for signal handler    
+    sys.locust_environment = environment  # Store environment for signal handler   
+@events.test_stop.add_listener
+def on_test_stop(environment, **kwargs):
+    """Generate unified report at test completion"""
+    if isinstance(environment.runner, MasterRunner):
+        logging.info("Test stopped on master, generating unified report")
+        all_metrics = []
+        if hasattr(sys, "master_reports"):
+            for worker_id, worker_metrics in sys.master_reports.items():
+                all_metrics.extend(worker_metrics)
+        else:
+            logging.warning("No master_reports attribute found on sys module")
+            all_metrics = []        
+        
+        if not all_metrics:
+            logging.warning("No metrics data to write to CSV")
+            return
+
+        start_time = datetime.now()
+        output_file = f"performance_report_{start_time.strftime('%Y%m%d_%H%M%S')}.csv"
+
+        try:
+            with open(output_file, 'w', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=["timestamp", "operation", "response_time", "status"])
+                writer.writeheader()
+                writer.writerows(all_metrics)
+            logging.info(f"Unified report generated: {output_file}")
+        except Exception as e:
+            logging.error(f"Failed to generate report: {str(e)}")
+            
+def handle_metrics_report(environment, msg, **kwargs):
+    """Master handler for worker metrics reports"""
+    worker_id = msg.data["worker_id"]
+    worker_metrics = msg.data["metrics"]
+    sys.master_reports[worker_id] = worker_metrics
+    logging.info(f"Received metrics from worker {worker_id} ({len(worker_metrics)} entries)")
 
 class JFrogXrayUser(HttpUser):
     wait_time = between(1, 5)
@@ -377,37 +415,13 @@ class JFrogXrayUser(HttpUser):
                 })
 
     def on_stop(self):
-        """Generate report when tests complete"""
-        logging.debug("on_stop method called")
-        logging.info(f"Metrics data contains {len(metrics_data)} entries")
-        if not metrics_data:
-            logging.warning("No metrics data to write to CSV")
-            output_file = f"performance_report_{self.start_time.strftime('%Y%m%d_%H%M%S')}_empty.csv"
-            try:
-                with open(output_file, 'w', newline='') as f:
-                    writer = csv.DictWriter(f, fieldnames=["timestamp", "operation", "response_time", "status"])
-                    writer.writeheader()
-                logging.info(f"Empty report generated: {output_file}")
-            except Exception as e:
-                logging.error(f"Failed to generate empty report: {str(e)}")
-            return
-        output_file = f"performance_report_{self.start_time.strftime('%Y%m%d_%H%M%S')}.csv"
-        try:
-            with open(output_file, 'w', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=["timestamp", "operation", "response_time", "status"])
-                writer.writeheader()
-                writer.writerows(metrics_data)
-            logging.info(f"Report generated: {output_file}")
-        except Exception as e:
-            logging.error(f"Failed to generate report: {str(e)}")
-            # Try writing to a fallback location
-            fallback_file = f"/tmp/{output_file}" if os.name != 'nt' else f"C:\\Temp\\{output_file}"
-            try:
-                os.makedirs(os.path.dirname(fallback_file), exist_ok=True)
-                with open(fallback_file, 'w', newline='') as f:
-                    writer = csv.DictWriter(f, fieldnames=["timestamp", "operation", "response_time", "status"])
-                    writer.writeheader()
-                    writer.writerows(metrics_data)
-                logging.info(f"Fallback report generated: {fallback_file}")
-            except Exception as fallback_e:
-                logging.error(f"Failed to generate fallback report: {str(fallback_e)}")
+        """Send metrics to master at user completion"""
+        if isinstance(self.environment.runner, WorkerRunner):
+            worker_id = self.environment.runner.worker_index
+            logging.info(f"Worker {worker_id} sending {len(metrics_data)} metrics to master")
+            self.environment.runner.send_message("metrics_report", {
+                "worker_id": worker_id,
+                "metrics": metrics_data.copy()
+            })
+        metrics_data.clear()  # Clear local metrics after reporting
+
