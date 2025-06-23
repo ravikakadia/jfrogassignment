@@ -1,0 +1,29 @@
+Performance Metrics Summary
+Total Requests: 8
+Operations: create_repository, create_policy, check_scan_status, get_violations, create_watch
+Success Rate: 87.50%
+Failure Rate: 12.50%
+Configuration:
+  jfrog_url: https://trialvq0712.jfrog.io
+  username: unknown
+  num_users: unknown
+  spawn_rate: unknown
+  test_start_time: 2025-06-22T05:16:48
+  test_duration: 11 seconds (estimated)
+  repo_name_pattern: docker-local-<timestamp>-<uuid>
+  image_name: alpine:3.9
+  custom_tag: test
+Average Response Time (ms):
+  check_scan_status: 371.34
+  create_policy: 315.85
+  create_repository: 710.07
+  create_watch: 2173.51
+  get_violations: 333.57
+Maximum Response Time (ms):
+  check_scan_status: 371.34
+  create_policy: 327.77
+  create_repository: 1098.12
+  create_watch: 2173.51
+  get_violations: 333.57
+Failure Counts:
+  check_scan_status: 1
