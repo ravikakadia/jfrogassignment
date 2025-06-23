@@ -44,7 +44,7 @@ This project uses [Locust](https://locust.io/) to perform load testing on JFrog 
 
 3. **Install Dependencies**:
    ```bash
-   pip install locust>=2.0.0 docker>=6.0.0 pandas matplotlib seaborn
+   pip install -r requirements.txt
    ```
 
 4. **Verify Permissions**:
