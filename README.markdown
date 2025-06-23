@@ -5,7 +5,7 @@ This project uses [Locust](https://locust.io/) to perform load testing on JFrog 
 ## Project Structure
 - `locustfile.py`: Defines Locust tasks for testing JFrog APIs.
 - `config.py`: Configuration file with JFrog URL, credentials, and test parameters.
-- `analyze_report.py`: Analyzes the CSV report and generates visualizations (`response_time.png`, `failure_counts.png`) and a metrics summary (`metrics_summary.txt`).
+- `aanalysis.py`: Analyzes the CSV report and generates visualizations (`response_time.png`, `failure_counts.png`) and a metrics summary (`metrics_summary.txt`).
 - `analysis.md`: Documents observations and recommendations based on test results.
 - `performance_report_YYYYMMDD_HHMMSS.csv`: Output report with test configuration and performance metrics.
 - `requirements.txt`: Lists Python dependencies.
@@ -13,7 +13,7 @@ This project uses [Locust](https://locust.io/) to perform load testing on JFrog 
 ## Prerequisites
 - **Python**: 3.8+
 - **Docker**: Installed and running, with access to `alpine:3.9`.
-- **JFrog Artifactory**: Access to a Pro-X or higher instance (e.g., `https://trialvq0712.jfrog.io`) with valid credentials.
+- **JFrog Artifactory**: Access to a trial instance or Pro-X or higher instance (e.g., `https://trialvq0712.jfrog.io`) with valid credentials.
 - **Dependencies**:
   ```bash
   pip install -r requirements.txt
