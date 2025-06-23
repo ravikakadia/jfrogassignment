@@ -127,6 +127,8 @@ The Locust test performs the following tasks:
     ```
 
 ## Future Improvements
+- Export configuration parameters as OS environment variable or in Vault like key store
+- Not expose password in config.py
 - Increase user load to stress-test Artifactory.
 - Integrate `analyze_report.py` into a CI/CD pipeline.
 - Add server-side monitoring for JFrog Artifactory.
