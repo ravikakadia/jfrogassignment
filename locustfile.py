@@ -27,15 +27,6 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
-
-# Configuration
-#JFROG_URL = "https://trialvq0712.jfrog.io"
-#USERNAME = "perftest"  # Replace with your admin username
-#PASSWORD = "PerfTest123$"  # Replace with your password
-#REPO_NAME = "docker-local"
-#IMAGE_NAME = "alpine:3.9"
-# CUSTOM_TAG = "test"
-
 # Metrics storage
 metrics_data = []
 
@@ -424,4 +415,3 @@ class JFrogXrayUser(HttpUser):
                 "metrics": metrics_data.copy()
             })
         metrics_data.clear()  # Clear local metrics after reporting
-
